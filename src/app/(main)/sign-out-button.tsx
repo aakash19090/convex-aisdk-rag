@@ -1,12 +1,14 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { LogOut } from 'lucide-react';
+import { useAuthActions } from '@convex-dev/auth/react';
 
 export function SignOutButton() {
-  return (
-    <Button variant="outline" onClick={() => {}} title="Sign out">
-      <LogOut />
-    </Button>
-  );
+    const { signOut } = useAuthActions();
+    return (
+        <Button variant='outline' onClick={() => signOut()} title='Sign out'>
+            <LogOut />
+        </Button>
+    );
 }
