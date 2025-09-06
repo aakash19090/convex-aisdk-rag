@@ -5,6 +5,7 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import {
     convertToModelMessages,
     LanguageModel,
+    smoothStream,
     streamText,
     UIMessage,
 } from 'ai';
@@ -18,7 +19,7 @@ http.route({
     path: '/api/chat',
     method: 'POST',
     handler: httpAction(async (ctx, req) => {
-        const userId = getAuthUserId(ctx);
+        const userId = await getAuthUserId(ctx);
         if (!userId) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -31,14 +32,13 @@ http.route({
 
         const result = streamText({
             model: google('gemini-2.5-flash-lite') as LanguageModel,
-            system: 'ad',
+            system: `You are a helpful assistant that answers the user's questions.`,
             messages: convertToModelMessages(contextMessages),
             onError(error) {
                 console.log('StreamText Error: ', error);
             },
+            experimental_transform: smoothStream(),
         });
-
-        console.log('result', result);
 
         return result.toUIMessageStreamResponse({
             headers: new Headers({
